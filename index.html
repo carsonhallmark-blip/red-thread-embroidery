@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Red Thread Embroidery — Hand-stitched, made for you</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Work+Sans:wght@400;500;600&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --linen:        #FBF8F2;
+    --paper:        #FFFDF9;
+    --stripe:       #F1D9D3;
+    --stripe-soft:  #F6E5E1;
+    --thread:       #B23A2E;
+    --thread-deep:  #832A20;
+    --thread-bright:#C9463A;
+    --ink:          #2E2822;
+    --ink-soft:     #6B5F55;
+    --sage:         #7C8B6F;
+    --gold:         #C99A3E;
+    --line:         rgba(46,40,34,0.12);
+    --shadow:       rgba(60,30,25,0.14);
+
+    --font-display: 'Fraunces', serif;
+    --font-body: 'Work Sans', sans-serif;
+    --font-hand: 'Caveat', cursive;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    position:relative;
+    font-family: var(--font-body);
+    color: var(--ink);
+    background: var(--linen);
+    overflow-x:hidden;
+  }
+  a{ color:inherit; }
+  img,svg{ display:block; max-width:100%; height:auto; }
+
+  /* ---------- background: hand-drawn linen stripes ---------- */
+  .linen-bg{
+    position:fixed;
+    inset:0;
+    background-image: repeating-linear-gradient(
+      90deg,
+      var(--linen) 0px, var(--linen) 22px,
+      var(--stripe) 22px, var(--stripe) 34px
+    );
+    filter: url(#pencilWobble);
+    z-index:0;
+    pointer-events:none;
+  }
+  /* fine weft threads crossing the vertical stripes, like a real weave */
+  .weave{
+    position:fixed; inset:0;
+    z-index:1; pointer-events:none;
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        rgba(70,45,38,0.05) 0px, rgba(70,45,38,0.05) 1px,
+        rgba(255,255,255,0.05) 1px, rgba(255,255,255,0.05) 2px,
+        transparent 2px, transparent 3px
+      );
+    mix-blend-mode: multiply;
+    opacity:.55;
+  }
+  /* soft diagonal light catch, like fabric under a window */
+  .sheen{
+    position:fixed; inset:0;
+    z-index:1; pointer-events:none;
+    background: linear-gradient(115deg,
+      rgba(255,255,255,0.55) 0%,
+      rgba(255,255,255,0) 22%,
+      rgba(255,255,255,0) 68%,
+      rgba(120,70,60,0.06) 100%);
+    mix-blend-mode: soft-light;
+    opacity:.8;
+  }
+  .grain{
+    position:fixed; inset:0;
+    z-index:1; pointer-events:none;
+    opacity:.4;
+    mix-blend-mode:multiply;
+    background: transparent;
+  }
+  .grain svg{ width:100%; height:100%; }
+
+  .flower-field{
+    position:fixed; inset:0;
+    z-index:1; pointer-events:none; overflow:hidden;
+  }
+  .flower{
+    position:absolute;
+    width:64px; height:64px;
+    opacity:.9;
+    transform-origin:50% 50%;
+    animation: sway 7s ease-in-out infinite alternate;
+  }
+  .flower svg{ width:100%; height:100%; overflow:visible; }
+  @keyframes sway{
+    from{ transform: rotate(var(--r,0deg)) scale(var(--s,1)); }
+    to{ transform: rotate(calc(var(--r,0deg) + 2.2deg)) scale(var(--s,1)); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .flower{ animation:none; }
+  }
+
+  /* ---------- layout shells ---------- */
+  header, main, footer{ position:relative; z-index:2; }
+
+  .panel{
+    background: rgba(255,253,249,0.86);
+    backdrop-filter: blur(2px);
+  }
+
+  .wrap{
+    max-width:1120px;
+    margin:0 auto;
+    padding:0 28px;
+  }
+
+  /* ---------- nav ---------- */
+  .nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:22px 28px;
+    max-width:1120px;
+    margin:0 auto;
+  }
+  .nav-mark{
+    font-family: var(--font-display);
+    font-weight:600;
+    font-size:1.15rem;
+    letter-spacing:.03em;
+    color: var(--thread-deep);
+    text-decoration:none;
+    border:1.5px solid var(--thread-deep);
+    border-radius:50%;
+    width:44px; height:44px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .nav-links{
+    display:flex;
+    gap:32px;
+    list-style:none;
+    margin:0; padding:0;
+  }
+  .nav-links a{
+    text-decoration:none;
+    font-size:.94rem;
+    font-weight:500;
+    color: var(--ink);
+    padding:6px 2px;
+    border-bottom:1.5px solid transparent;
+    transition: border-color .2s ease, color .2s ease;
+  }
+  .nav-links a:hover, .nav-links a:focus-visible{
+    border-bottom-color: var(--thread);
+    color: var(--thread-deep);
+  }
+  .nav-toggle{
+    display:none;
+    align-items:center;
+    justify-content:center;
+    width:44px; height:44px;
+    background:none;
+    border:1.5px solid var(--thread-deep);
+    border-radius:10px;
+    cursor:pointer;
+    padding:0;
+  }
+  .nav-toggle svg{ width:20px; height:20px; }
+
+  /* ---------- hero ---------- */
+  .hero{
+    text-align:center;
+    padding: 9vh 24px 10vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .eyebrow{
+    font-family: var(--font-hand);
+    font-size:1.4rem;
+    color: var(--thread-deep);
+    margin:0 0 6px;
+  }
+  .wordmark{
+    margin:0;
+    font-family: var(--font-display);
+    font-weight:600;
+    line-height:.98;
+    color: var(--thread-deep);
+    font-size: clamp(2.6rem, 8vw, 5.4rem);
+  }
+  .wordmark span{ display:block; }
+  .wordmark .accent{ font-style:italic; font-weight:500; color:var(--thread-bright); }
+
+  .stitch-rule{
+    width:min(420px, 70vw);
+    height:26px;
+    margin:18px auto 22px;
+  }
+
+  .tagline{
+    max-width:480px;
+    font-size:1.08rem;
+    color: var(--ink-soft);
+    line-height:1.55;
+    margin:0 0 30px;
+  }
+
+  .cta-row{
+    display:flex;
+    gap:16px;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:13px 26px;
+    border-radius:30px;
+    font-family: var(--font-body);
+    font-weight:600;
+    font-size:.95rem;
+    text-decoration:none;
+    border:1.5px solid var(--thread-deep);
+    transition: transform .18s ease, background .18s ease, color .18s ease;
+  }
+  .btn:hover, .btn:focus-visible{ transform: translateY(-2px); }
+  .btn-primary{
+    background: var(--thread-deep);
+    color: var(--paper);
+  }
+  .btn-primary:hover{ background: var(--thread-bright); }
+  .btn-ghost{
+    background: transparent;
+    color: var(--thread-deep);
+  }
+  .btn-ghost:hover{ background: rgba(131,42,32,0.08); }
+  .btn[aria-disabled="true"]{
+    opacity:.55;
+    cursor:default;
+    transform:none !important;
+  }
+
+  /* ---------- section shells ---------- */
+  section{ padding: 78px 0; }
+  .section-head{
+    text-align:center;
+    max-width:560px;
+    margin:0 auto 46px;
+  }
+  .kicker{
+    font-family: var(--font-hand);
+    color: var(--thread-deep);
+    font-size:1.25rem;
+    display:block;
+    margin-bottom:2px;
+  }
+  h2{
+    font-family: var(--font-display);
+    font-weight:600;
+    font-size: clamp(1.7rem, 4vw, 2.4rem);
+    margin: 0 0 10px;
+    color: var(--ink);
+  }
+  .section-sub{
+    color: var(--ink-soft);
+    font-size:1.02rem;
+    line-height:1.6;
+    margin:0;
+  }
+
+  /* ---------- values ---------- */
+  .values-inner{
+    display:grid;
+    grid-template-columns: repeat(3,1fr);
+    gap:28px;
+  }
+  .value{
+    padding:30px 24px;
+    background: var(--paper);
+    border:1px solid var(--line);
+    border-radius:14px;
+    text-align:left;
+  }
+  .value .num{
+    font-family: var(--font-hand);
+    color: var(--thread);
+    font-size:1.3rem;
+  }
+  .value h3{
+    font-family: var(--font-display);
+    font-size:1.18rem;
+    margin: 6px 0 8px;
+    color: var(--ink);
+  }
+  .value p{
+    margin:0;
+    color: var(--ink-soft);
+    font-size:.95rem;
+    line-height:1.55;
+  }
+
+  /* ---------- gallery ---------- */
+  .gallery-grid{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap:22px;
+  }
+  .card{
+    background: var(--paper);
+    border:1px solid var(--line);
+    border-radius:16px;
+    overflow:hidden;
+    opacity:0;
+    transform: translateY(16px);
+    transition: opacity .6s ease, transform .6s ease;
+  }
+  .card.in-view{ opacity:1; transform:none; }
+  .card-art{
+    aspect-ratio: 1 / 1;
+    display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(180deg, var(--linen), var(--paper));
+    padding:20px;
+  }
+  .card-body{ padding:16px 18px 20px; }
+  .card-body h3{
+    font-family: var(--font-display);
+    font-size:1.05rem;
+    margin:0 0 4px;
+    color: var(--ink);
+  }
+  .card-body p{
+    margin:0;
+    font-size:.86rem;
+    color: var(--ink-soft);
+  }
+  @media (prefers-reduced-motion: reduce){
+    .card{ transition:none; }
+  }
+
+  /* ---------- designer teaser ---------- */
+  .designer{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:56px;
+    align-items:center;
+  }
+  .designer-copy .kicker{ text-align:left; }
+  .badge{
+    display:inline-block;
+    font-size:.72rem;
+    font-weight:600;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color: var(--thread-deep);
+    background: rgba(178,58,46,0.1);
+    border:1px solid rgba(178,58,46,0.3);
+    padding:4px 10px;
+    border-radius:20px;
+    margin-bottom:14px;
+  }
+  .designer-copy h2{ text-align:left; }
+  .designer-copy p{
+    color: var(--ink-soft);
+    line-height:1.65;
+    margin:0 0 26px;
+    max-width:440px;
+  }
+  .mock{
+    background: var(--paper);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:34px 28px;
+    box-shadow: 0 18px 40px -18px var(--shadow);
+  }
+  .hoop{
+    width:100%;
+    aspect-ratio: 1/1;
+    max-width:280px;
+    margin:0 auto 22px;
+  }
+  .mock-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    margin-bottom:16px;
+    flex-wrap:wrap;
+  }
+  .swatch{
+    width:22px; height:22px;
+    border-radius:50%;
+    border:2px solid var(--paper);
+    box-shadow:0 0 0 1.5px var(--line);
+  }
+  .pill{
+    font-size:.8rem;
+    font-weight:500;
+    padding:6px 14px;
+    border-radius:20px;
+    background: var(--linen);
+    border:1px solid var(--line);
+    color: var(--ink-soft);
+  }
+  .slider-mock{
+    width:70%;
+    margin:0 auto;
+    height:4px;
+    border-radius:4px;
+    background: var(--stripe);
+    position:relative;
+  }
+  .slider-mock::after{
+    content:"";
+    position:absolute; left:62%; top:50%;
+    width:16px; height:16px;
+    background: var(--thread-deep);
+    border-radius:50%;
+    transform: translate(-50%,-50%);
+    box-shadow:0 2px 6px var(--shadow);
+  }
+
+  /* ---------- about ---------- */
+  .about-inner{
+    display:grid;
+    grid-template-columns: 260px 1fr;
+    gap:48px;
+    align-items:center;
+  }
+  .photo-frame{
+    aspect-ratio: 4/5;
+    border-radius:16px;
+    border:2px dashed var(--thread);
+    background: var(--paper);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    color: var(--ink-soft);
+    text-align:center;
+    padding:16px;
+  }
+  .photo-frame span{ font-size:.82rem; }
+  .about-copy .kicker{ text-align:left; }
+  .about-copy h2{ text-align:left; }
+  .about-copy p{
+    color: var(--ink-soft);
+    line-height:1.7;
+    max-width:520px;
+  }
+
+  /* ---------- contact ---------- */
+  .contact-inner{
+    max-width:560px;
+    margin:0 auto;
+    background: var(--paper);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:40px;
+  }
+  .field{ margin-bottom:18px; display:flex; flex-direction:column; gap:6px; }
+  .field label{ font-size:.85rem; font-weight:600; color: var(--ink); }
+  .field input, .field textarea{
+    font-family: var(--font-body);
+    font-size:.95rem;
+    padding:12px 14px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background: var(--linen);
+    color: var(--ink);
+    resize:vertical;
+  }
+  .field input:focus-visible, .field textarea:focus-visible{
+    outline:2px solid var(--thread);
+    outline-offset:1px;
+  }
+  .contact-inner .btn{ width:100%; justify-content:center; border:none; }
+  .contact-alt{
+    text-align:center;
+    margin-top:22px;
+    font-size:.88rem;
+    color: var(--ink-soft);
+  }
+
+  /* ---------- footer ---------- */
+  footer{
+    padding:36px 0 44px;
+    text-align:center;
+  }
+  .footer-mark{
+    font-family: var(--font-display);
+    font-weight:600;
+    color: var(--thread-deep);
+    font-size:1.05rem;
+    margin-bottom:6px;
+  }
+  footer p{
+    margin:0;
+    font-size:.82rem;
+    color: var(--ink-soft);
+  }
+
+  a:focus-visible, button:focus-visible{
+    outline:2px solid var(--thread);
+    outline-offset:2px;
+  }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 860px){
+    .values-inner{ grid-template-columns:1fr; }
+    .gallery-grid{ grid-template-columns: repeat(2,1fr); }
+    .designer{ grid-template-columns:1fr; gap:36px; }
+    .about-inner{ grid-template-columns:1fr; }
+    .photo-frame{ max-width:220px; margin:0 auto; }
+  }
+  @media (max-width: 620px){
+    .nav-toggle{ display:flex; }
+    .nav-links{
+      display:none;
+      position:absolute;
+      top:78px; left:20px; right:20px;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:2px;
+      background: var(--paper);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px 16px;
+      box-shadow: 0 16px 34px -14px var(--shadow);
+      z-index:5;
+    }
+    .nav-links.open{ display:flex; }
+    .nav-links a{
+      width:100%;
+      padding:12px 2px;
+      font-size:.98rem;
+      border-bottom:1px solid var(--line);
+    }
+    .nav-links li:last-child a{ border-bottom:none; }
+    .gallery-grid{ grid-template-columns:1fr 1fr; gap:14px; }
+    section{ padding:56px 0; }
+    .contact-inner{ padding:26px; }
+    .field input, .field textarea{ font-size:1rem; }
+  }
+  @media (max-width: 380px){
+    .gallery-grid{ grid-template-columns:1fr; max-width:260px; margin:0 auto; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- hand-drawn linen background -->
+  <div class="linen-bg" aria-hidden="true"></div>
+  <div class="weave" aria-hidden="true"></div>
+  <div class="sheen" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true">
+    <svg xmlns="http://www.w3.org/2000/svg">
+      <filter id="grainFilter">
+        <feTurbulence type="fractalNoise" baseFrequency="0.75 0.85" numOctaves="3" stitchTiles="stitch" result="n"/>
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.42  0 0 0 0 0.30  0 0 0 0 0.26  0 0 0 0.09 0"/>
+      </filter>
+      <rect width="100%" height="100%" filter="url(#grainFilter)"/>
+    </svg>
+  </div>
+
+  <!-- filter used to give the printed stripes a colored-pencil wobble -->
+  <svg width="0" height="0" style="position:absolute">
+    <filter id="pencilWobble" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.018 0.9" numOctaves="2" seed="7" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </svg>
+
+  <!-- scattered embroidered flowers -->
+  <div class="flower-field" aria-hidden="true">
+    <!-- reusable flower symbol -->
+    <svg width="0" height="0" style="position:absolute">
+      <symbol id="rt-flower" viewBox="0 0 100 100">
+        <defs>
+          <linearGradient id="petalGrad" x1="50" y1="50" x2="50" y2="0" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#832A20"/>
+            <stop offset="55%" stop-color="#B23A2E"/>
+            <stop offset="100%" stop-color="#D06156"/>
+          </linearGradient>
+        </defs>
+        <!-- leaves -->
+        <g fill="#7C8B6F" opacity="0.9">
+          <path d="M50,55 C34,58 22,70 18,86 C34,86 46,76 50,55 Z"/>
+          <path d="M50,55 C66,58 78,70 82,86 C66,86 54,76 50,55 Z"/>
+        </g>
+        <!-- petals -->
+        <g>
+          <g transform="rotate(0 50 50)"><path d="M50,50 C41,34 41,10 50,0 C59,10 59,34 50,50 Z" fill="url(#petalGrad)" stroke="#6E2019" stroke-width="0.6"/></g>
+          <g transform="rotate(60 50 50)"><path d="M50,50 C41,34 41,10 50,0 C59,10 59,34 50,50 Z" fill="url(#petalGrad)" stroke="#6E2019" stroke-width="0.6"/></g>
+          <g transform="rotate(120 50 50)"><path d="M50,50 C41,34 41,10 50,0 C59,10 59,34 50,50 Z" fill="url(#petalGrad)" stroke="#6E2019" stroke-width="0.6"/></g>
+          <g transform="rotate(180 50 50)"><path d="M50,50 C41,34 41,10 50,0 C59,10 59,34 50,50 Z" fill="url(#petalGrad)" stroke="#6E2019" stroke-width="0.6"/></g>
+          <g transform="rotate(240 50 50)"><path d="M50,50 C41,34 41,10 50,0 C59,10 59,34 50,50 Z" fill="url(#petalGrad)" stroke="#6E2019" stroke-width="0.6"/></g>
+          <g transform="rotate(300 50 50)"><path d="M50,50 C41,34 41,10 50,0 C59,10 59,34 50,50 Z" fill="url(#petalGrad)" stroke="#6E2019" stroke-width="0.6"/></g>
+        </g>
+        <!-- french-knot center -->
+        <g fill="#C99A3E">
+          <circle cx="50" cy="50" r="5"/>
+          <circle cx="45" cy="47" r="3.4"/>
+          <circle cx="55" cy="47" r="3.4"/>
+          <circle cx="50" cy="55" r="3.4"/>
+        </g>
+      </symbol>
+    </svg>
+
+    <div class="flower" style="top:6%; left:8%;   width:70px; height:70px; --r:-6deg;"><svg><use href="#rt-flower"/></svg></div>
+    <div class="flower" style="top:14%; left:86%; width:56px; height:56px; --r:10deg;"><svg><use href="#rt-flower"/></svg></div>
+    <div class="flower" style="top:34%; left:3%;  width:48px; height:48px; --r:4deg;"><svg><use href="#rt-flower"/></svg></div>
+    <div class="flower" style="top:44%; left:93%; width:64px; height:64px; --r:-8deg;"><svg><use href="#rt-flower"/></svg></div>
+    <div class="flower" style="top:60%; left:10%; width:58px; height:58px; --r:8deg;"><svg><use href="#rt-flower"/></svg></div>
+    <div class="flower" style="top:70%; left:80%; width:50px; height:50px; --r:-4deg;"><svg><use href="#rt-flower"/></svg></div>
+    <div class="flower" style="top:86%; left:6%;  width:60px; height:60px; --r:6deg;"><svg><use href="#rt-flower"/></svg></div>
+    <div class="flower" style="top:92%; left:90%; width:52px; height:52px; --r:-10deg;"><svg><use href="#rt-flower"/></svg></div>
+  </div>
+
+  <header class="nav">
+    <a class="nav-mark" href="#top" aria-label="Red Thread Embroidery, home">RT</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#work">Work</a></li>
+      <li><a href="#design">Design Your Own</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <path d="M2 5h16M2 10h16M2 15h16"/>
+      </svg>
+    </button>
+  </header>
+
+  <main>
+    <section class="hero" id="top">
+      <p class="eyebrow">hand embroidery, made to order</p>
+      <h1 class="wordmark">
+        <span>Red Thread</span>
+        <span class="accent">Embroidery</span>
+      </h1>
+      <svg class="stitch-rule" viewBox="0 0 420 26" aria-hidden="true">
+        <path d="M4,13 Q30,2 56,13 T108,13 T160,13 T212,13 T264,13 T316,13 T368,13" fill="none" stroke="#B23A2E" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="10 8"/>
+        <circle cx="392" cy="13" r="4.5" fill="none" stroke="#832A20" stroke-width="2"/>
+        <path d="M392,17.5 L392,26" stroke="#832A20" stroke-width="1.4"/>
+      </svg>
+      <p class="tagline">Every stitch done by hand — hats, shirts, blankets, and pretty much anything you bring me. Tell me what you're picturing, and I'll thread it up.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#work">See the Work</a>
+        <a class="btn btn-ghost" href="#design">Design Something</a>
+      </div>
+    </section>
+
+    <section class="values panel">
+      <div class="wrap values-inner">
+        <div class="value">
+          <span class="num">01</span>
+          <h3>Real needle and thread</h3>
+          <p>Every piece is stitched on an embroidery machine I run and finish by hand — no heat transfers, no printers.</p>
+        </div>
+        <div class="value">
+          <span class="num">02</span>
+          <h3>Almost any blank canvas</h3>
+          <p>Caps, tees, denim jackets, baby blankets, totes — if it holds a needle, I can probably work with it.</p>
+        </div>
+        <div class="value">
+          <span class="num">03</span>
+          <h3>Design it yourself</h3>
+          <p>Pick your spot, type your words, choose a font, color, and size — and see it before you order.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="gallery panel" id="work">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="kicker">a few recent pieces</span>
+          <h2>Recent Stitching</h2>
+          <p class="section-sub">A small sample of what's come off the hoop lately. Swap these in with photos of your own work.</p>
+        </div>
+        <div class="gallery-grid">
+
+          <article class="card">
+            <div class="card-art">
+              <svg width="150" height="150" viewBox="0 0 150 150">
+                <path d="M25,95 Q75,50 125,95 L125,102 Q75,60 25,102 Z" fill="#2E2822"/>
+                <path d="M28,96 Q75,54 122,96 L124,90 Q75,50 26,90 Z" fill="#3C342C"/>
+                <g transform="translate(62,68) scale(0.28)"><use href="#rt-flower"/></g>
+              </svg>
+            </div>
+            <div class="card-body">
+              <h3>Ballcap, monogram</h3>
+              <p>Structured cotton cap, single flower on the front panel.</p>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-art">
+              <svg width="150" height="150" viewBox="0 0 150 150">
+                <path d="M55,30 L45,20 L20,32 L28,50 L38,44 L38,120 L112,120 L112,44 L122,50 L130,32 L105,20 L95,30 Q75,42 55,30 Z" fill="#C7D3DC" stroke="#8FA0AC" stroke-width="1.5"/>
+                <g transform="translate(60,64) scale(0.3)"><use href="#rt-flower"/></g>
+              </svg>
+            </div>
+            <div class="card-body">
+              <h3>Chambray shirt</h3>
+              <p>Wildflower sprig stitched over the breast pocket.</p>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-art">
+              <svg width="150" height="150" viewBox="0 0 150 150">
+                <rect x="24" y="34" width="102" height="82" rx="6" fill="#F3EADF" stroke="#B23A2E" stroke-width="2" stroke-dasharray="4 5"/>
+                <g transform="translate(60,58) scale(0.34)"><use href="#rt-flower"/></g>
+                <text x="75" y="106" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-size="15" fill="#832A20">Wyatt</text>
+              </svg>
+            </div>
+            <div class="card-body">
+              <h3>Baby blanket</h3>
+              <p>Soft flannel, name and a single flower in the corner.</p>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-art">
+              <svg width="150" height="150" viewBox="0 0 150 150">
+                <path d="M40,50 L110,50 L118,120 L32,120 Z" fill="#DDD3C4" stroke="#8C7F6C" stroke-width="1.5"/>
+                <path d="M55,50 C55,32 95,32 95,50" fill="none" stroke="#8C7F6C" stroke-width="3"/>
+                <g transform="translate(58,72) scale(0.3)"><use href="#rt-flower"/></g>
+              </svg>
+            </div>
+            <div class="card-body">
+              <h3>Canvas tote</h3>
+              <p>Everyday tote with a small red flower off-center.</p>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <section class="designer" id="design">
+      <div class="wrap designer" style="display:grid;">
+        <div class="designer-copy">
+          <span class="badge">coming soon</span>
+          <span class="kicker">build your own</span>
+          <h2>Design your piece before it's stitched</h2>
+          <p>Choose the size of the area you want embroidered, then type your text, pick a font and thread color, and size it to fit. You'll see a live preview before anything touches the fabric.</p>
+          <a class="btn btn-primary" href="#contact">Ask About This</a>
+        </div>
+        <div class="mock" aria-hidden="true">
+          <svg class="hoop" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="92" fill="#F3EADF" stroke="#8C7F6C" stroke-width="10"/>
+            <circle cx="100" cy="100" r="92" fill="none" stroke="#6B5F55" stroke-width="2" opacity="0.4"/>
+            <text x="100" y="96" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-weight="600" font-size="30" fill="#832A20">Wyatt</text>
+            <path d="M62,110 Q100,122 138,110" fill="none" stroke="#B23A2E" stroke-width="2" stroke-dasharray="5 5"/>
+          </svg>
+          <div class="mock-row">
+            <span class="swatch" style="background:#B23A2E;"></span>
+            <span class="swatch" style="background:#2E2822;"></span>
+            <span class="swatch" style="background:#7C8B6F;"></span>
+            <span class="swatch" style="background:#C99A3E;"></span>
+            <span class="pill">Script font</span>
+          </div>
+          <div class="slider-mock"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="about panel" id="about">
+      <div class="wrap about-inner">
+        <div class="photo-frame">
+          <svg width="34" height="34" viewBox="0 0 34 34" fill="none" stroke="#B23A2E" stroke-width="1.6">
+            <circle cx="17" cy="12" r="6"/>
+            <path d="M4,30 C4,21 10,18 17,18 C24,18 30,21 30,30"/>
+          </svg>
+          <span>Photo placeholder — swap in a picture of you at the hoop</span>
+        </div>
+        <div class="about-copy">
+          <span class="kicker">who's behind the needle</span>
+          <h2>Hi, I'm [Your Name]</h2>
+          <p>I've been embroidering for [X years], starting with hand-me-down hoops and a lot of trial and error. These days I run a machine out of [home/studio], but every design still gets planned, digitized, and finished by hand — and every order is made one at a time, just for you.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact" id="contact">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="kicker">let's talk stitches</span>
+          <h2>Get In Touch</h2>
+          <p class="section-sub">Tell me what you have in mind and I'll get back to you.</p>
+        </div>
+        <div class="contact-inner">
+          <form onsubmit="event.preventDefault(); this.reset(); alert('Thanks! This is a demo form — connect it to email or a form service to go live.');">
+            <div class="field">
+              <label for="name">Name</label>
+              <input id="name" type="text" required placeholder="Your name">
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" type="email" required placeholder="you@email.com">
+            </div>
+            <div class="field">
+              <label for="message">What are you picturing?</label>
+              <textarea id="message" rows="4" placeholder="A hat, a blanket, a name, an idea..."></textarea>
+            </div>
+            <button class="btn btn-primary" type="submit">Send Message</button>
+          </form>
+          <p class="contact-alt">Or find her at <strong>@redthreadembroidery</strong></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-mark">Red Thread Embroidery</div>
+    <p>Made by hand, one stitch at a time. © <span id="year"></span></p>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in-view'); io.unobserve(e.target); } });
+    }, { threshold:.15 });
+    document.querySelectorAll('.card').forEach(c=>io.observe(c));
+
+    const navToggle = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+    navToggle.addEventListener('click', ()=>{
+      const isOpen = navLinks.classList.toggle('open');
+      navToggle.setAttribute('aria-expanded', String(isOpen));
+      navToggle.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+    });
+    navLinks.querySelectorAll('a').forEach(a=>{
+      a.addEventListener('click', ()=>{
+        navLinks.classList.remove('open');
+        navToggle.setAttribute('aria-expanded','false');
+        navToggle.setAttribute('aria-label','Open menu');
+      });
+    });
+  </script>
+</body>
+</html>
